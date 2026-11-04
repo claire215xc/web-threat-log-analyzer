@@ -1,0 +1,3 @@
+{"timestamp":"2026-11-04T10:00:00+09:00","client_ip":"192.0.2.10","method":"GET","uri":"/","status":200,"user_agent":"Mozilla/5.0"}
+{"timestamp":"2026-11-04T10:00:01+09:00","client_ip":"198.51.100.10","method":"GET","uri":"/search?q=%3Cscript%3Ealert(1)%3C/script%3E","status":403,"user_agent":"Mozilla/5.0"}
+{"timestamp":"2026-11-04T10:00:02+09:00","client_ip":"203.0.113.9","method":"GET","uri":"/api/v3/api-docs","status":200,"user_agent":"python-requests/2.31.0"}
