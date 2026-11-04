@@ -2,7 +2,7 @@
 
 A lightweight **offline** HTTP access-log triage tool written in Python. It uses **only the Python standard library** and supports common Apache/Nginx combined access logs and newline-delimited JSON (JSONL) records.
 
-**Status:** v0.1.0, initial public prototype. Detection is heuristic, not a vulnerability scanner or an incident-confirmation system.
+**Status:** v0.1.0 released; v0.2.0 enhancements in development. This is an initial public prototype. Detection is heuristic, not a vulnerability scanner or an incident-confirmation system.
 
 ## Features
 
@@ -12,6 +12,8 @@ A lightweight **offline** HTTP access-log triage tool written in Python. It uses
 - CSV findings (UTF-8 with BOM for spreadsheet compatibility) and JSON summary
 - Offline processing: **no external API, network traffic, or third-party packages**
 - Unit tests and synthetic sample logs
+- Batch mode for recursive folders, multiple files and glob patterns
+- Batch IP-level CSV and self-contained HTML summary
 
 ## Requirements
 
@@ -40,6 +42,37 @@ Each line must contain a JSON object with at least one of `uri`, `request_uri`, 
 - Timestamp: `timestamp`, `time`, `time_local`
 
 Other JSON field layouts and multiline JSON are not supported in v0.1.0. Request bodies, TLS encryption, PCAP, and compressed log input are outside current scope.
+
+## Batch analysis (proposed v0.2.0)
+
+The original single-file command remains available. For a folder of logs, run:
+
+```bash
+python batch_analyzer.py --input samples/
+python batch_analyzer.py --input samples/sample_access.log samples/sample_jsonl.jsonl
+python batch_analyzer.py --input "samples/*.log"
+```
+
+Directories are scanned **recursively** for `.log`, `.jsonl`, and `.txt` files. Explicitly named files can use other extensions. Overlapping inputs are deduplicated. Batch input supports the same Apache/Nginx combined and one-JSON-object-per-line formats as the original analyzer.
+
+By default, four local files are written to the Git-ignored `results/` directory:
+
+| Path | Contents |
+| --- | --- |
+| `results/batch_findings.csv` | One row per rule match, including source file, request URI, rule ID and severity |
+| `results/ip_summary.csv` | Every matched client IP with event counts and per-rule findings |
+| `results/batch_summary.json` | Input-level counts, rule counts, severity counts and top 20 IPs |
+| `results/report.html` | Standalone HTML overview of top IPs, rules, and file coverage |
+
+**Interpretation:** A *matched event* is a request with one or more detection rules. *Findings* count rule matches, so one event may have multiple findings. Counts do not establish attack success or compromise.
+
+**Privacy:** The HTML report excludes raw request URIs and user agents, and escapes visible log-derived values. However, IP addresses and source filenames still appear in HTML. Detailed CSV includes raw URIs and can contain sensitive information. Keep all generated outputs private unless separately reviewed and sanitized. No input is uploaded by the program.
+
+Run all tests with:
+
+```bash
+python -m unittest discover -s tests -v
+```
 
 ## Rules and interpretation
 
