@@ -30,6 +30,10 @@ jobs:
       - name: Run unit tests
         run: python -m unittest discover -s tests -v
 
+      - name: Run batch analysis on sample folder
+        run: |
+          python batch_analyzer.py --input samples/ --output results/batch_findings.csv --summary results/batch_summary.json --html results/report.html --ip-output results/ip_summary.csv
+
       - name: Run log analysis on sample
         run: |
           python web_log_analyzer.py --input samples/sample_access.log --output results/findings.csv --summary results/summary.json
